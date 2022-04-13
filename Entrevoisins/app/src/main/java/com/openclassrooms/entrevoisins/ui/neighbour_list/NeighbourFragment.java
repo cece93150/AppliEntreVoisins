@@ -30,6 +30,7 @@ public class NeighbourFragment extends Fragment {
     private Boolean favorites;
     private static final String FAVORITE_LIST_KEY = "isFavorite";
 
+
     /**
      * Create and return a new instance
      *
@@ -50,6 +51,7 @@ public class NeighbourFragment extends Fragment {
         Bundle bundle = this.getArguments();
         if (bundle != null) {
             favorites = bundle.getBoolean(FAVORITE_LIST_KEY);
+
         }
     }
 
@@ -68,6 +70,10 @@ public class NeighbourFragment extends Fragment {
      * Init the List of neighbours
      */
     private void initList() {
+        if (favorites) {
+            mRecyclerView.setContentDescription("List of favorites");
+        } else {
+            mRecyclerView.setContentDescription("List of neighbours");}
         if (favorites) {
             mNeighbours = mApiService.getFavNeighbours();
         } else {
@@ -105,4 +111,5 @@ public class NeighbourFragment extends Fragment {
         mApiService.deleteNeighbour(event.neighbour);
         initList();
     }
+
 }

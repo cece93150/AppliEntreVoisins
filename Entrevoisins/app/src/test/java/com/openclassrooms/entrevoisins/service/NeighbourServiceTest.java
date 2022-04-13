@@ -70,6 +70,7 @@ public class NeighbourServiceTest {
     @Test
     public void addFavorite() {
         Neighbour neighbour0 = service.getNeighbours().get(0);
+        neighbour0.setFavoriteNeighbour(false);
         service.toggleNeighbourFavorite(neighbour0);
         assertTrue(service.getFavNeighbours().contains(neighbour0));
     }
@@ -77,7 +78,7 @@ public class NeighbourServiceTest {
     @Test
     public void deleteFavorite() {
         Neighbour favorite = service.getNeighbours().get(0);
-        service.toggleNeighbourFavorite(favorite);
+        favorite.setFavoriteNeighbour(true);
         service.toggleNeighbourFavorite(favorite);
         assertFalse(service.getFavNeighbours().contains(favorite));
     }

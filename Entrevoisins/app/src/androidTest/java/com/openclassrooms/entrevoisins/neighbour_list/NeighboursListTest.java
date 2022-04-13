@@ -3,7 +3,7 @@ package com.openclassrooms.entrevoisins.neighbour_list;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.action.ViewActions.pressBack;
+import static android.support.test.espresso.Espresso.pressBack;
 import static android.support.test.espresso.action.ViewActions.swipeLeft;
 import static android.support.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
@@ -14,7 +14,9 @@ import static android.support.test.espresso.matcher.ViewMatchers.assertThat;
 import static android.support.test.espresso.matcher.ViewMatchers.hasMinimumChildCount;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayingAtLeast;
+import static android.support.test.espresso.AmbiguousViewMatcherException.Builder;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
+import static android.support.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
@@ -22,11 +24,13 @@ import static com.openclassrooms.entrevoisins.utils.RecyclerViewItemCountAsserti
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.core.IsNull.notNullValue;
 
+import android.support.test.espresso.AmbiguousViewMatcherException;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -53,9 +57,6 @@ import org.junit.runner.RunWith;
  */
 @RunWith(AndroidJUnit4.class)
 public class NeighboursListTest {
-    {
-        mApiService = DI.getNewInstanceApiService();
-    }
 
     // This is fixed
     private static int ITEMS_COUNT = 12;
@@ -76,6 +77,7 @@ public class NeighboursListTest {
     public void setUp() {
         mActivity = mActivityRule.getActivity();
         assertThat(mActivity, notNullValue());
+        mApiService = DI.getNewInstanceApiService();
     }
 
     /**
@@ -120,7 +122,7 @@ public class NeighboursListTest {
     @Test
     public void userName_is_no_empty_and_correct() {
         //click on the 1st user of the list (Caroline)
-        onView(allOf(withId(R.id.list_neighbours), isDisplayingAtLeast(100)))
+        onView(allOf(withId(R.id.list_neighbours), isDisplayed()))
                 .perform(actionOnItemAtPosition(0, click()));
         //check that the name field is not empty in the user profile
         onView(withId(R.id.user_Profile_Name)).check(matches(notNullValue()));
@@ -128,4 +130,37 @@ public class NeighboursListTest {
         onView(withId(R.id.user_Profile_Name)).check(matches(withText("Caroline")));
     }
 
+    @Test
+    public void show_favorite_on_favorite_list() {
+        //click on the first user
+        onView(allOf(withId(R.id.list_neighbours), isDisplayed()))
+        .perform(actionOnItemAtPosition(0, click()));
+        //click on favorite button
+        onView(withId(R.id.fav_button)).perform(click());
+        //click on back arrow
+        pressBack();
+        //swipe left
+        onView(withId(R.id.container)).perform(swipeLeft());
+        //check that there is 1 user in the favorites list
+        onView(allOf(withId(R.id.list_neighbours), withContentDescription("List of favorites"))).check(withItemCount(1));
+
+    }
+
+    private static Matcher<View> childAtPosition(final Matcher<View> parentMatcher, final int position) {
+        return new TypeSafeMatcher<View>() {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("Child at position " + position + " in parent ");
+                parentMatcher.describeTo(description);
+            }
+
+            @Override
+            public boolean matchesSafely(View view) {
+                ViewParent parent = view.getParent();
+                return parent instanceof ViewGroup && parentMatcher.matches(parent)
+                        && view.equals(((ViewGroup) parent).getChildAt(position));
+            }
+        };
+
+    }
 }
