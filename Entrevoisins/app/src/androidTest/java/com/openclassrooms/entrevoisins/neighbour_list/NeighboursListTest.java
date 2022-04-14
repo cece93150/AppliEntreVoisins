@@ -60,7 +60,6 @@ public class NeighboursListTest {
 
     // This is fixed
     private static int ITEMS_COUNT = 12;
-    private static int FAVORITES_ITEMS_COUNT = 0;
     NeighbourApiService mApiService;
 
     private ListNeighbourActivity mActivity;
@@ -95,13 +94,25 @@ public class NeighboursListTest {
      */
     @Test
     public void myNeighboursList_deleteAction_shouldRemoveItem() {
-        // Given : We remove the element at position 2
+        //click on the second user of the list (Jack)
+        onView(allOf(withId(R.id.list_neighbours), isDisplayed()))
+                .perform(actionOnItemAtPosition(1, click()));
+        //check that Jack is entered in the Name field
+        onView(withId(R.id.user_Profile_Name)).check(matches(withText("Jack")));
+        //return on the list of neighbours
+        pressBack();
+        // Then : the number of element is 12
         onView(allOf(withId(R.id.list_neighbours), isDisplayed())).check(withItemCount(ITEMS_COUNT));
         // When perform a click on a delete icon
         onView(allOf(withId(R.id.list_neighbours), isDisplayed()))
                 .perform(actionOnItemAtPosition(1, new DeleteViewAction()));
         // Then : the number of element is 11
         onView(allOf(withId(R.id.list_neighbours), isDisplayed())).check(withItemCount(ITEMS_COUNT - 1));
+        //click on the second user of the list (Jack)
+        onView(allOf(withId(R.id.list_neighbours), isDisplayed()))
+                .perform(actionOnItemAtPosition(1, click()));
+        //check that Chloé is entered in the Name field
+        onView(withId(R.id.user_Profile_Name)).check(matches(withText("Chloé")));
     }
 
     /**
@@ -132,18 +143,25 @@ public class NeighboursListTest {
 
     @Test
     public void show_favorite_on_favorite_list() {
-        //click on the first user
+        //click on the first user of neighbours list
         onView(allOf(withId(R.id.list_neighbours), isDisplayed()))
-        .perform(actionOnItemAtPosition(0, click()));
+                .perform(actionOnItemAtPosition(0, click()));
+        //check that Caroline is entered in the Name field
+        onView(withId(R.id.user_Profile_Name)).check(matches(notNullValue()));
+        onView(withId(R.id.user_Profile_Name)).check(matches(withText("Caroline")));
         //click on favorite button
         onView(withId(R.id.fav_button)).perform(click());
         //click on back arrow
         pressBack();
         //swipe left
         onView(withId(R.id.container)).perform(swipeLeft());
-        //check that there is 1 user in the favorites list
-        onView(allOf(withId(R.id.list_neighbours), withContentDescription("List of favorites"))).check(withItemCount(1));
-
+        // Then : the number of element is 1
+        onView(allOf(withId(R.id.list_neighbours), isDisplayed())).check(withItemCount(1));
+        //click on first user of favorite list
+        onView(allOf(withId(R.id.list_neighbours), withContentDescription("List of favorites"))).perform(actionOnItemAtPosition(0, click()));
+        //check that Caroline is entered in the Name field
+        onView(withId(R.id.user_Profile_Name)).check(matches(notNullValue()));
+        onView(withId(R.id.user_Profile_Name)).check(matches(withText("Caroline")));
     }
 
     private static Matcher<View> childAtPosition(final Matcher<View> parentMatcher, final int position) {
