@@ -14,6 +14,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.allOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -22,7 +23,6 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(JUnit4.class)
 public class NeighbourServiceTest {
-
     private NeighbourApiService service;
 
     @Before
@@ -36,6 +36,14 @@ public class NeighbourServiceTest {
         List<Neighbour> expectedNeighbours = DummyNeighbourGenerator.DUMMY_NEIGHBOURS;
         assertThat(neighbours, IsIterableContainingInAnyOrder.containsInAnyOrder(expectedNeighbours.toArray()));
     }
+    @Test
+    public void getNeighboursWithSuccesss() {
+        service.getNeighbours().get(0).setFavorite(true);
+        List<Neighbour> favneighbours = service.getFavNeighbours();
+        Neighbour user = service.getNeighbours().get(0);
+        assertThat(favneighbours, IsIterableContainingInAnyOrder.containsInAnyOrder(user));
+    }
+
 
     @Test
     public void deleteNeighbourWithSuccess() {
@@ -46,24 +54,21 @@ public class NeighbourServiceTest {
 
     @Test
     public void getFavoriteListWithSuccess() {
-        service.getFavNeighbours().clear();
         service.getNeighbours().get(0).setFavorite(true);
-        service.getNeighbours().get(3).setFavorite(true);
-        List<Neighbour> favoriteNeighbourList = service.getFavNeighbours();
-        assertFalse(favoriteNeighbourList.isEmpty());
-        assertTrue(service.getFavNeighbours().get(0).getFavorite());
+        List<Neighbour> favneighbours = service.getFavNeighbours();
+        Neighbour user = service.getNeighbours().get(0);
+        assertThat(favneighbours, IsIterableContainingInAnyOrder.containsInAnyOrder(user));
     }
 
     @Test
     public void deleteFavoriteNeighbourWithSuccess() {
         service.getFavNeighbours().clear();
         service.getNeighbours().get(0).setFavorite(true);
-        service.getNeighbours().get(3).setFavorite(true);
-        assertEquals(2, service.getFavNeighbours().size());
-        Neighbour neighbour = service.getNeighbours().get(0);
-        service.toggleNeighbourFavorite(neighbour);
-        assertEquals(1, service.getFavNeighbours().size());
-        assertFalse(service.getNeighbours().get(0).getFavorite());
+        List<Neighbour> favneighbours = service.getFavNeighbours();
+        Neighbour user0 = service.getNeighbours().get(0);
+        assertThat(favneighbours, IsIterableContainingInAnyOrder.containsInAnyOrder(user0));
+        service.toggleNeighbourFavorite(user0);
+        assertNotSame(favneighbours, IsIterableContainingInAnyOrder.containsInAnyOrder(user0));
     }
 
     @Test
