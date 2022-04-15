@@ -108,7 +108,7 @@ public class NeighboursListTest {
                 .perform(actionOnItemAtPosition(1, new DeleteViewAction()));
         // Then : the number of element is 11
         onView(allOf(withId(R.id.list_neighbours), isDisplayed())).check(withItemCount(ITEMS_COUNT - 1));
-        //click on the second user of the list (Jack)
+        //click on the second user of the list (Chloé)
         onView(allOf(withId(R.id.list_neighbours), isDisplayed()))
                 .perform(actionOnItemAtPosition(1, click()));
         //check that Chloé is entered in the Name field
